@@ -2380,21 +2380,20 @@ There is no jump from book 4 to book 1.
 
     positions = positions.map(position => {
 
-      if (position === "left")
-        return "center";
+  if (position === "right")
+    return "center";
 
-      if (position === "center")
-        return "right";
+  if (position === "center")
+    return "left";
 
-      if (position === "right")
-        return "hidden-left";
+  if (position === "left")
+    return "hidden-left";
 
-      if (position === "hidden-right")
-        return "left";
+  if (position === "hidden-right")
+    return "right";
 
-      return position;
-    });
-
+  return position;
+});
     current = (current + 1) % 4;
 
     render(true);
