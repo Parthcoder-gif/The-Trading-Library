@@ -4,34 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1075156961813482');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1075156961813482&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
-
-<!-- your existing <title>, CSS links, and any other head content continue here as before -->
-
 <!-- =====================================================================
      WEBSITE SETTINGS — EDIT HERE
      ---------------------------------------------------------------------
      Everything you'll need to update day-to-day lives in ONE place:
      the SITE_SETTINGS object below.
 
-       • BUY_LINK          → your checkout / payment link
-                              (every "buy" button on the site uses this)
+       • BUY_LINK_ENGLISH   → checkout link for the ENGLISH books
+       • BUY_LINK_HINDI     → checkout link for the HINDI books
+                              (every button with the matching class
+                              uses its own link automatically)
        • VIDEO_ID           → the ID of your YouTube video
                               (the part after "v=" in a normal YouTube URL)
        • CURRENT_PRICE      → the price shown in gold (e.g. "₹297")
@@ -49,10 +31,13 @@ src="https://www.facebook.com/tr?id=1075156961813482&ev=PageView&noscript=1"
 
     // ---------------------------------------------------------------
     // PAYMENT / CHECKOUT
-    // Paste your checkout / payment gateway link below.
-    // Every button with the class "js-buy-button" will use this link.
+    // Paste your two Superprofile checkout links below — one for the
+    // English books, one for the Hindi books.
+    // Buttons with class "js-buy-button-en" use BUY_LINK_ENGLISH.
+    // Buttons with class "js-buy-button-hi" use BUY_LINK_HINDI.
     // ---------------------------------------------------------------
-    BUY_LINK: "https://superprofile.bio/vp/trading-library-—-the-complete-trader-s-combo",
+    BUY_LINK_ENGLISH: "https://superprofile.bio/vp/trading-library-—-the-complete-trader-s-combo",
+    BUY_LINK_HINDI: "https://superprofile.bio/vp/trading-library-—-एक-complete-trader-बनने-का-पूरा-रास्ता",
 
     // ---------------------------------------------------------------
     // YOUTUBE VIDEO
@@ -109,17 +94,23 @@ src="https://www.facebook.com/tr?id=1075156961813482&ev=PageView&noscript=1"
   // =====================================================================
   document.addEventListener("DOMContentLoaded", function () {
 
-    /* ---------- 1. BUY BUTTONS ---------- */
-    (function applyBuyLink(){
-      var link = (SITE_SETTINGS.BUY_LINK || "").trim();
-      var isValid = link !== "" && link !== "PASTE-YOUR-CHECKOUT-LINK-HERE";
-      var buttons = document.querySelectorAll(".js-buy-button");
+    /* ---------- 1. BUY BUTTONS (ENGLISH + HINDI) ---------- */
+    (function applyBuyLinks(){
 
-      buttons.forEach(function (btn) {
-        // If no real link has been set yet, keep href="#" so the
-        // page never navigates to a broken/placeholder destination.
-        btn.setAttribute("href", isValid ? link : "#");
-      });
+      function wireButtons(selector, link){
+        var value = (link || "").trim();
+        // Treat anything still starting with "PASTE-" as not filled in yet.
+        var isValid = value !== "" && value.indexOf("PASTE-") !== 0;
+
+        document.querySelectorAll(selector).forEach(function (btn) {
+          // If no real link has been set yet, keep href="#" so the
+          // page never navigates to a broken/placeholder destination.
+          btn.setAttribute("href", isValid ? value : "#");
+        });
+      }
+
+      wireButtons(".js-buy-button-en", SITE_SETTINGS.BUY_LINK_ENGLISH);
+      wireButtons(".js-buy-button-hi", SITE_SETTINGS.BUY_LINK_HINDI);
     })();
 
     /* ---------- 2. PRICE DISPLAYS ---------- */
@@ -411,6 +402,13 @@ h1 span{
   flex-wrap:wrap;
 }
 
+.cta-buttons{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
 .cta{
   position:relative;z-index:3;isolation:isolate;
   min-height:62px;padding:0 28px;display:inline-flex;align-items:center;justify-content:center;gap:13px;
@@ -419,6 +417,16 @@ h1 span{
   box-shadow:0 10px 24px rgba(0,0,0,.25);overflow:hidden;
   transition:transform .22s ease,background .22s ease,box-shadow .22s ease;
   animation:ctaAttention 6s ease-in-out infinite;
+}
+
+/* Hindi button uses the site's existing green accent instead of gold,
+   so the two languages are easy to tell apart at a glance. */
+.cta.cta-hindi{
+  background:#22C55E;
+  color:#fff;
+}
+.cta.cta-hindi:hover{
+  background:#16A34A;
 }
 
 .cta::before,
@@ -781,7 +789,15 @@ h1 span{
     align-items:stretch;
   }
 
+  .cta-buttons{
+    flex-wrap:nowrap;
+    gap:8px;
+  }
+
   .cta{
+    flex:1 1 0;
+    min-width:0;
+    padding:0 10px;
     justify-content:center;
   }
 
@@ -1495,6 +1511,35 @@ h1 span{
 .cta-label strong{font-size:1.65rem;font-weight:900;line-height:1;display:inline-block;animation:cta-price-shake 2.8s ease-in-out infinite;}
 .cta-label del{font-size:13px;}
 @keyframes cta-price-shake{0%,78%,100%{transform:translateX(0)}80%{transform:translateX(-1.5px)}82%{transform:translateX(1.5px)}84%{transform:translateX(-1px)}86%{transform:translateX(1px)}88%{transform:translateX(0)}}
+
+/* Fix: on mobile, the two hero buttons (English + Hindi) sit side by
+   side. The rule above forces the label onto one line with a large
+   price, which made the buttons wider than the screen. This override
+   (more specific, so it wins) lets the label wrap onto two lines
+   instead — keeping the price clearly readable while both buttons
+   fit within the screen width. */
+@media (max-width:600px){
+  .cta-buttons .cta{
+    padding:8px 8px;
+    min-height:66px;
+  }
+  .cta-buttons .cta-label{
+    display:inline;
+    white-space:normal;
+    text-align:center;
+    line-height:1.3;
+    font-size:11.5px;
+  }
+  .cta-buttons .cta-label strong{
+    font-size:1.2rem;
+  }
+  .cta-buttons .cta-label del{
+    font-size:10.5px;
+  }
+  .cta-buttons .cta-arrow{
+    display:none;
+  }
+}
 @media (prefers-reduced-motion:reduce){.cta-label strong{animation:none;}}
 
 </style>
@@ -1623,10 +1668,19 @@ h1 span{
 
       <div class="cta-row">
 
-        <a href="#" class="cta js-buy-button" aria-label="Get all 4 books for ₹297">
-          <span class="cta-label">GET ALL 4 BOOKS — <del class="js-price-old">₹1,499</del> <strong class="js-price-current">₹297</strong></span>
-          <span class="cta-arrow" aria-hidden="true">→</span>
-        </a>
+        <div class="cta-buttons">
+
+          <a href="#" class="cta js-buy-button-en" aria-label="Get the English books for ₹297">
+            <span class="cta-label">ENGLISH EBOOK — <del class="js-price-old">₹1,499</del> <strong class="js-price-current">₹297</strong></span>
+            <span class="cta-arrow" aria-hidden="true">→</span>
+          </a>
+
+          <a href="#" class="cta cta-hindi js-buy-button-hi" aria-label="हिंदी किताबें ₹297 में पाएं">
+            <span class="cta-label" lang="hi">हिंदी ईबुक — <del class="js-price-old">₹1,499</del> <strong class="js-price-current">₹297</strong></span>
+            <span class="cta-arrow" aria-hidden="true">→</span>
+          </a>
+
+        </div>
 
         <span class="trust">
           One complete trading library. Learn at your own pace.
@@ -2367,33 +2421,35 @@ There is no jump from book 4 to book 1.
     /*
       Every book moves ONE physical position:
 
-      hidden-right → left
-      left         → center
-      center       → right
-      right        → hidden-left
+      hidden-left  → right
+      right        → center
+      center       → left
+      left         → hidden-left
 
       The hidden-left book is immediately placed at
-      hidden-right after the transition.
+      hidden-right after the transition, ready to enter
+      from the right again next time.
 
       This produces an endless loop without a jump.
     */
 
     positions = positions.map(position => {
 
-  if (position === "right")
-    return "center";
+      if (position === "right")
+        return "center";
 
-  if (position === "center")
-    return "left";
+      if (position === "center")
+        return "left";
 
-  if (position === "left")
-    return "hidden-left";
+      if (position === "left")
+        return "hidden-left";
 
-  if (position === "hidden-right")
-    return "right";
+      if (position === "hidden-right")
+        return "right";
 
-  return position;
-});
+      return position;
+    });
+
     current = (current + 1) % 4;
 
     render(true);
@@ -2700,13 +2756,17 @@ There is no jump from book 4 to book 1.
 .pricing-benefits{width:min(470px,100%);margin:28px auto 30px;display:grid;gap:11px;text-align:left;}
 .pricing-benefit{display:flex;align-items:center;gap:11px;color:#F8FAFC;font-size:13px;line-height:1.45;}
 .pricing-benefit::before{content:'✓';flex:0 0 auto;color:#4ADE80;font-size:15px;font-weight:800;}
+.pricing-cta-group{display:flex;flex-direction:column;align-items:center;gap:14px;}
+/* Hindi pricing button uses the same green accent as the hero Hindi button. */
+.pricing-cta.pricing-cta-hindi{background:#22C55E;color:#fff;}
+.pricing-cta.pricing-cta-hindi:hover{background:#16A34A;}
 .pricing-cta{
   position:relative;z-index:2;isolation:isolate;
   min-height:66px;width:min(500px,100%);padding:0 30px;
   display:inline-flex;align-items:center;justify-content:center;gap:14px;
   border:0 !important;border-radius:13px;outline:0;
   background:#D4AF37;color:#0F172A;
-  font-size:15px;font-weight:800;letter-spacing:.01em;line-height:1;
+  font-size:18px;font-weight:800;letter-spacing:.01em;line-height:1.25;
   text-decoration:none !important;
   box-shadow:0 12px 28px rgba(0,0,0,.28);
   overflow:hidden;
@@ -2728,7 +2788,7 @@ There is no jump from book 4 to book 1.
   .pricing-current{font-size:3.35rem}
   .pricing-benefits{margin-top:24px;margin-bottom:26px}
   .pricing-benefit{font-size:12px}
-  .pricing-cta{min-height:62px;padding:0 18px;font-size:13px}
+  .pricing-cta{min-height:64px;padding:0 16px;font-size:15.5px;}
 }
 </style>
 
@@ -2756,10 +2816,16 @@ There is no jump from book 4 to book 1.
         <div class="pricing-benefit">Lifetime access</div>
       </div>
 
-      <a href="#" class="pricing-cta js-buy-button" aria-label="Get all 4 books for 297 rupees">
-        <span>GET ALL 4 BOOKS — <span class="js-price-current">₹297</span></span>
-        <span class="pricing-cta-arrow" aria-hidden="true">→</span>
-      </a>
+      <div class="pricing-cta-group">
+        <a href="#" class="pricing-cta js-buy-button-en" aria-label="Get the English books for 297 rupees">
+          <span>GET ENGLISH BOOKS — <span class="js-price-current">₹297</span></span>
+          <span class="pricing-cta-arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="#" class="pricing-cta pricing-cta-hindi js-buy-button-hi" aria-label="हिंदी किताबें ₹297 में पाएं">
+          <span lang="hi">हिंदी किताबें खरीदें — <span class="js-price-current">₹297</span></span>
+          <span class="pricing-cta-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -2789,6 +2855,75 @@ There is no jump from book 4 to book 1.
 
 
 <!-- =========================================================
+     REFUND POLICY & CUSTOMER SUPPORT SECTION
+     ========================================================= -->
+<style>
+.policy-section{
+  background:#0B1220;
+  color:#fff;
+  padding:44px 0;
+  border-top:1px solid #334155;
+}
+.policy-inner{
+  width:min(900px,calc(100% - 32px));
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:34px;
+}
+.policy-title{
+  margin:0 0 10px;
+  color:#D4AF37;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.policy-text{
+  margin:0;
+  color:#94A3B8;
+  font-size:13px;
+  line-height:1.7;
+}
+.policy-email{
+  color:#D4AF37;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+@media(max-width:680px){
+  .policy-inner{
+    grid-template-columns:1fr;
+    text-align:center;
+    gap:26px;
+  }
+}
+</style>
+<section class="policy-section" id="policy" aria-label="Refund policy and customer support">
+  <div class="policy-inner">
+
+    <div class="policy-block">
+      <h3 class="policy-title">Refund Policy</h3>
+      <p class="policy-text">
+        All purchases of the <span class="js-brand-name">TRADING LIBRARY</span> eBooks are final.
+        Because this is instantly delivered digital content, we do not offer refunds,
+        exchanges or cancellations once a purchase is completed. Please review the
+        book descriptions carefully before buying.
+      </p>
+    </div>
+
+    <div class="policy-block">
+      <h3 class="policy-title">Customer Support</h3>
+      <p class="policy-text">
+        For any questions about your order or access to your eBooks, contact us at
+        <a class="policy-email" href="mailto:anujj2200@gmail.com">anujj2200@gmail.com</a>.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- =========================================================
      FOOTER
      ========================================================= -->
 <footer class="site-footer" aria-label="Website footer">
@@ -2806,11 +2941,12 @@ There is no jump from book 4 to book 1.
           <a href="#step-4">Reader Feedback</a>
           <a href="#purchase">Purchase</a>
           <a href="#step-5">FAQ</a>
+          <a href="#policy">Refund & Support</a>
         </nav>
       </div>
       <div>
         <p class="footer-title">LEGAL / INFORMATION</p>
-        <div class="footer-disclaimer">Educational disclaimer. This series is for educational and informational purposes only. It is not investment advice and does not constitute a recommendation to buy or sell any security or currency. Learnvestor is not SEBI registered and does not provide tips, signals or advisory services. Trading and investing carry risk of financial loss. Past performance does not indicate future results.</div>
+        <div class="footer-disclaimer">Educational disclaimer. This series is for educational and informational purposes only. It is not investment advice and does not constitute a recommendation to buy or sell any security or currency. <span class="js-brand-name">TRADING LIBRARY</span> is not SEBI registered and does not provide tips, signals or advisory services. Trading and investing carry risk of financial loss. Past performance does not indicate future results.</div>
       </div>
     </div>
     <div class="footer-bottom">
