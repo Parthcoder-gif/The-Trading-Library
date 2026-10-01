@@ -30,6 +30,19 @@ fbq('track', 'PageView');
 src="https://www.facebook.com/tr?id=1075156961813482&ev=PageView&noscript=1"/>
 </noscript>
 <!-- End Meta Pixel Code -->
+     <script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".js-buy-button-en, .js-buy-button-hi").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var isHindi = btn.classList.contains("js-buy-button-hi");
+      fbq("track", "InitiateCheckout", {
+        content_name: isHindi ? "Hindi eBooks" : "English eBooks",
+        content_category: isHindi ? "hindi" : "english"
+      });
+    });
+  });
+});
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
